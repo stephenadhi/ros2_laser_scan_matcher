@@ -79,6 +79,7 @@ private:
   std::string base_frame_;
   std::string odom_frame_;
   std::string laser_frame_;
+  std::string scan_topic_;
   std::string odom_topic_;
 
   // Keyframe parameters

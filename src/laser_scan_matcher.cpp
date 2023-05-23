@@ -65,6 +65,8 @@ LaserScanMatcher::LaserScanMatcher() : Node("laser_scan_matcher"), initialized_(
   // Initiate parameters
 
    RCLCPP_INFO(get_logger(), "Creating laser_scan_matcher");
+  add_parameter("scan_topic", rclcpp::ParameterValue(std::string("")),
+    "Name of the laserscan topic");
   add_parameter("publish_odom", rclcpp::ParameterValue(std::string("")),
     "If publish odometry from laser_scan. Empty if not, otherwise name of the topic");
   add_parameter("publish_tf",   rclcpp::ParameterValue(false),
@@ -190,6 +192,7 @@ LaserScanMatcher::LaserScanMatcher() : Node("laser_scan_matcher"), initialized_(
   laser_frame_ = this->get_parameter("laser_frame").as_string();
   kf_dist_linear_  = this->get_parameter("kf_dist_linear").as_double();
   kf_dist_angular_ = this->get_parameter("kf_dist_angular").as_double();
+  scan_topic_   = this->get_parameter("scan_topic").as_string();
   odom_topic_   = this->get_parameter("publish_odom").as_string();
   publish_tf_   = this->get_parameter("publish_tf").as_bool(); 
 
@@ -243,7 +246,7 @@ LaserScanMatcher::LaserScanMatcher() : Node("laser_scan_matcher"), initialized_(
 
 
   // Subscribers
-  this->scan_filter_sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>("scan", rclcpp::SensorDataQoS(), std::bind(&LaserScanMatcher::scanCallback, this, std::placeholders::_1));
+  this->scan_filter_sub_ = this->create_subscription<sensor_msgs::msg::LaserScan>(scan_topic_, rclcpp::SensorDataQoS(), std::bind(&LaserScanMatcher::scanCallback, this, std::placeholders::_1));
   tf_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
   if (publish_tf_)
     tfB_ = std::make_shared<tf2_ros::TransformBroadcaster>(*this);
